@@ -1,0 +1,62 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+http://rpubs.com/vsensae/DiagrammeR
+
+```{r}
+library(magrittr)
+con <- url("http://cran.r-project.org/src/contrib/PACKAGES") # DESCRIPTION Files 
+ndf_pack<- read.dcf(con, all = TRUE)%>%  # Parsing dcf into a Data Frame. 1 Line = 1 Node = 1 Package
+  dplyr::mutate(nodes=Package,label=Package) # Adding required columns `nodes` and `label` for NDF
+close(con)
+str(ndf_pack,width=100,strict.width="cut") # Quick check 
+```
+
+
+## Defining the Dependencies EDF
+
+```{r}
+edf_import<-ndf_pack%>%
+  dplyr::select(Package,Imports)%>%
+  tidyr::separate(col=Imports,
+             into=paste0("V",1:35),
+             sep=", ",
+             remove=TRUE)%>%
+  tidyr::gather(key=foo,
+                value=to,
+                -Package)%>%
+  dplyr::transmute(from=Package,
+                   to=to,
+                   rel="Import",
+                   color="DarkRed")%>%
+  dplyr::filter(!is.na(to))%>%
+  tidyr::separate(col=to,
+                into="to",
+                sep="\\s",
+                extra="drop")
+```
+
+
+```{r}
+edf_pack<-DiagrammeR::combine_edges(edf_import,
+                                     edf_depends) # Like rbind but different columns allowed
+# Nodes Connected to DiagrammeR with 30 step (enough to get them all!)
+nodes_DiagrammeR<-union(gtools::getDependencies("DiagrammeR",available=FALSE),"DiagrammeR")
+# EDF & NDF
+ndf_DiagrammeR<-data.frame(nodes=nodes_DiagrammeR)%>%dplyr::left_join(ndf_pack,by="nodes")
+edf_DiagrammeR<-dplyr::filter(edf_pack,from%in%nodes_DiagrammeR)
+# The Graph
+graph_DiagrammeR<-DiagrammeR::create_graph(ndf_DiagrammeR,
+                                           edf_DiagrammeR,
+                                           graph_attrs = c("layout = dot","overlap=FALSE"),
+                                           node_attrs = c("fontname = Helvetica"))
+# Specific Color for the DiagrammeR Node
+graph_DiagrammeR <- DiagrammeR::set_node_attr(graph_DiagrammeR,
+                                              nodes = c("DiagrammeR"),
+                                              node_attr = "fillcolor", 
+                                              values = "blue")
+```
+
+

@@ -1,0 +1,26 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+http://stephlocke.info/Rtraining/javascript.html
+
+```{r}
+library(DiagrammeR)
+
+mermaid("graph TB
+    subgraph High Level
+    D[Data] --> R[Read into memory]
+    R --> DM[Data manipulation]
+    DM --> V[Visualisation]
+    DM --> S[Statistical Analysis]
+    DM --> O[Output]
+    S --> V
+    V --> Do[Document]
+    Do --> O
+    V --> I[Interactive report]
+    I --> O
+end")
+```
+

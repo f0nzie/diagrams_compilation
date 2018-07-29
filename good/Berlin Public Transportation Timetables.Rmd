@@ -1,0 +1,110 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+http://rpubs.com/vsensae/DiagrammeR
+
+https://daten.berlin.de/datensaetze/vbb-fahrplandaten-ende-juni-bis-dezember-2016
+
+```{r}
+temp <- tempfile()
+download.file("http://www.vbb.de/de/download/GTFS_VBB_EndeJun_Dez2016.zip",temp)
+stops <- read.table(unz(temp,filename="stops.txt"),header=TRUE,sep=',',
+                    fileEncoding="UTF-8",stringsAsFactors = FALSE)
+stop_times <- read.table(unz(temp,filename="stop_times.txt"),header=TRUE,sep=',',
+                         fileEncoding="UTF-8",stringsAsFactors = FALSE)
+trips <- read.table(unz(temp,filename="trips.txt"),header=TRUE,sep=',',
+                    fileEncoding="UTF-8",stringsAsFactors = FALSE)
+routes <- read.table(unz(temp,filename="routes.txt"),header=TRUE,sep=',',
+                     fileEncoding="UTF-8",stringsAsFactors = FALSE)
+unlink(temp)
+```
+
+
+## Data Wrangling: U-Bahn Stations EDF
+
+```{r}
+library(dplyr)
+edf_ubahn<-filter(routes,route_short_name%in%
+                    c("U1","U2","U3","U4","U5","U6","U7","U8"))%>%
+  select(route_id,route_short_name)%>%
+  left_join(trips,by="route_id")%>%
+  group_by(trip_headsign,route_short_name)%>%
+  summarise(trip_id=first(trip_id))%>%
+  ungroup()%>%
+  left_join(stop_times,by=c("trip_id"))%>%
+  left_join(transmute(stop_times,
+                      trip_id=trip_id,
+                      stop_id_to=stop_id,
+                      arrival_time_to=arrival_time,
+                      stop_sequence=stop_sequence-1),
+            by=c("trip_id","stop_sequence"))%>%
+  transmute(from=stop_id,to=stop_id_to,type=route_short_name)%>%
+  filter(!is.na(to))%>%unique%>%
+  mutate(color=ifelse(type=="U1","blue",NA)%>%
+                       ifelse(type=="U2","red",.)%>%ifelse(type=="U3","green",.)%>%
+                       ifelse(type=="U4","lime",.)%>%ifelse(type=="U5","gold",.)%>%
+                       ifelse(type=="U6","purple",.)%>%ifelse(type=="U7","purple",.)%>%
+                       ifelse(type=="U8","purple",.))%>%
+  as.data.frame
+```
+
+## Data Wrangling: U-Bahn Stations NDF
+
+```{r}
+library(dplyr)
+ndf_ubahn<-filter(routes,route_short_name%in%
+                    c("U1","U2","U3","U4","U5","U6","U7","U8"))%>%
+  select(route_id,route_short_name)%>%
+  left_join(trips,by="route_id")%>%
+  group_by(trip_headsign,route_short_name)%>%
+  summarise(trip_id=first(trip_id))%>%
+  ungroup()%>%
+  left_join(stop_times,by=c("trip_id"))%>%
+  transmute(nodes=stop_id,stop_id=stop_id)%>%
+  unique%>%
+  left_join(stops,by="stop_id")%>%
+  transmute(nodes,label=stop_name,stop_lat,stop_lon)%>%
+  as.data.frame
+```
+
+## Input for graph Creation
+
+```{r}
+head(edf_ubahn)
+```
+
+```{r}
+head(ndf_ubahn)
+```
+
+```{r}
+library(DiagrammeR)
+
+graph_ubahn <- DiagrammeR::create_graph(ndf_ubahn, edf_ubahn)
+DiagrammeR::render_graph(graph_ubahn,output="visNetwork")
+```
+
+
+```{r}
+# Function: get connected nodes within a given number of step
+recursive_dep<-function(edf,ndf,nodes,number_step) {
+  if (number_step == 0) return(nodes) else return(
+    union(dplyr::filter(edf,from%in%nodes)%>%.$to,nodes)%>%
+  recursive_dep(edf,ndf,nodes=.,number_step-1))
+}
+# Nodes Connected to Nollendorf with 3 step
+nodes_sub<-recursive_dep(edf=edf_ubahn,ndf=ndf_ubahn,
+                         nodes=dplyr::filter(ndf_ubahn,grepl('Nollendorf',label))%>%.$nodes,
+                         number_step=3)
+# Your Input object
+ndf_sub<-data.frame(nodes=nodes_sub)%>%dplyr::left_join(ndf_ubahn,by="nodes")
+edf_sub<-dplyr::filter(edf_ubahn,from%in%nodes_sub)
+```
+
+```{r}
+graph_sub<-DiagrammeR::create_graph(ndf_sub,edf_sub)
+DiagrammeR::render_graph(graph_sub,output="visNetwork")
+```
+

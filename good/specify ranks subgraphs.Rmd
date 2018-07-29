@@ -1,0 +1,259 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+https://stackoverflow.com/questions/47836233/r-how-to-specify-ranks-in-subgraphs-in-diagrammer
+
+
+
+```{r}
+grViz("
+digraph datatracker {
+
+    graph [compound = true]
+
+    edge [color = grey,
+          arrowhead = vee]
+
+    # top node statements
+    subgraph cluster1 {
+        node [shape = box,
+        fontname = Helvetica,
+        width = 2, 
+        penwidth = 2,
+        style = filled,
+        fillcolor = lightblue,
+        label = A1,
+        tooltip = 'A1',
+        color = lightblue]
+        A1
+
+        node [shape = box,
+        fontname = Helvetica,
+        width = 2, 
+        penwidth = 2,
+        style = filled,
+        fillcolor = lightblue,
+        label = P1,
+        tooltip = 'P1',
+        color = lightblue]
+        P1
+
+        node [shape = box,
+        fontname = Helvetica,
+        width = 2, 
+        penwidth = 2,
+        style = filled,
+        fillcolor = lightblue,
+        label = P2,
+        tooltip = 'P2',
+        color = lightblue]
+        P2
+        P1->P2
+
+        rank = same; P2; A1  # rank does not seem to work
+        label = 'Cluster 1'
+        color = grey
+        fontsize = 15
+        fontcolor = grey
+    }
+
+    # bottom node statements
+    subgraph cluster2 {
+
+        node [shape = box,
+        fontname = Helvetica,
+        width = 2,
+        penwidth = 2,
+        style = filled,
+        fillcolor = steelblue,
+        label = A2,
+        tooltip = 'A2',
+        color = steelblue]
+        A2
+        A1->A2
+
+        node [shape = box,
+        fontname = Helvetica,
+        width = 2,
+        penwidth = 2,
+        style = filled,
+        fillcolor = steelblue,
+        label = A3,
+        tooltip = 'A3',
+        color = steelblue]
+        A3
+        A2->A3
+
+        node [shape = box,
+        fontname = Helvetica,
+        width = 2,
+        penwidth = 2,
+        style = filled,
+        fillcolor = steelblue,
+        label = P3,
+        tooltip = 'P3',
+        color = steelblue]
+        P3
+        P2->P3
+
+        node [shape = box,
+        fontname = Helvetica,
+        width = 2,
+        penwidth = 2,
+        style = filled,
+        fillcolor = steelblue,
+        label = P4,
+        tooltip = 'P4',
+        color = steelblue]
+        P4
+        P3->P4
+        A2->P4
+
+        node [shape = box,
+        fontname = Helvetica,
+        width = 2,
+        penwidth = 2,
+        style = filled,
+        fillcolor = steelblue,
+        label = P5,
+        tooltip = 'P5',
+        color = steelblue]
+        P5
+        P4->P5
+
+        node [shape = box,
+        fontname = Helvetica,
+        width = 2,
+        penwidth = 2,
+        style = filled,
+        fillcolor = steelblue,
+        alpha = 0.5,
+        label = AP,
+        tooltip = 'AP',
+        color = steelblue]
+        AP
+        P5->AP
+        A3->AP
+
+        rank = same; P4; A2 # rank does not seem to work
+        label = 'Cluster 2'
+        color = red
+        fontsize = 15
+        fontcolor = red 
+    }
+}
+")
+```
+
+```{r}
+library(DiagrammeR)
+
+grViz("
+digraph datatracker {
+
+    # graph, node, and edge definitions
+    graph [compound = true, nodesep = .5, ranksep = .25, 
+            color = crimson]
+    
+    node [fontname = Helvetica, fontcolor = darkslategray, 
+            shape = rectangle, fixedsize = true, width = 1, 
+            color = darkslategray]
+    
+    edge [color = grey, arrowhead = none, arrowtail = none]
+
+    A1
+    P1 -> P2
+    P2 -> P3
+    P3 -> P4
+    P4 -> P5
+    
+    A1 -> A2
+    A2 -> P4
+    A2 -> A3
+    
+    A3 -> AP
+    P5 -> AP
+
+}
+")
+```
+
+
+```{r}
+library(DiagrammeR)
+
+grViz("
+digraph datatracker {
+
+    
+    node [shape = box]
+    A1; P1; P2
+    
+    node [shape = box]
+    A2; A3; P3; P4; P5; AP
+    
+    # edge
+        P1 -> P2
+        P2 -> P3
+        P3 -> P4
+        P4 -> P5 
+        P5 -> AP
+        
+        A1 -> A2 -> A3
+        A2 -> P4
+        A3 -> AP
+    
+    
+    subgraph cluster_0 {
+        rank = same; A2; P4
+        
+    }
+
+    subgraph cluster_1 {
+        rank = same; A1; P2
+
+    }
+    
+
+}
+")
+```
+
+```{r}
+library(DiagrammeR)
+
+grViz("
+digraph datatracker {
+
+    
+    node [shape = box]
+    A1; P1; P2; P4
+    
+    node [shape = box]
+    A2; A3; P3; P4; P5; AP
+    
+    # edge
+    P1->P2 P2->P3 P3->P4 P4->P5 P5->AP
+        A1->A2->A3
+        A2->P4
+        A3->AP
+        
+
+    
+    
+    subgraph cluster_0 {
+        rank = same; A2; P4
+        
+    }
+
+    subgraph cluster_1 {
+        rank = same; A1; P2
+
+    }
+    
+
+}
+")
+```

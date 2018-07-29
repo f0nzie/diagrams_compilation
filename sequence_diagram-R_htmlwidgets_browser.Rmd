@@ -1,0 +1,28 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+http://www.buildingwidgets.com/blog/2015/1/8/week-01-easy-flowcharts-and-diagrams-diagrammer
+
+```{r}
+library(DiagrammeR)
+DiagrammeR("
+  sequenceDiagram;
+    participant R;
+    Note left of R: Get Data<br/>Do Calculations
+    htmlwidgets ->> R: dependencies, binding 
+    alt Static
+      R->>Browser: json;
+      Note right of Browser: User Interact
+    else Shiny
+      loop continuously in response to event
+        R-->>Browser: json over socket;
+        Browser-->>R: json over socket;
+        Note left of R: Get Data<br/>Do Calculations
+        Note right of Browser: User Interact
+      end
+    end
+")
+```
+

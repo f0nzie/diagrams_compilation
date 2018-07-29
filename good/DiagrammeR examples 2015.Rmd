@@ -1,0 +1,69 @@
+---
+title: "DiagrammeR examples May 2015"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE, error=TRUE, message=FALSE, warning=FALSE} 
+knitr::opts_chunk$set(echo=TRUE, comment=NA, error=TRUE, warning=FALSE, 
+                      message = FALSE, fig.align = 'center')
+```
+
+http://www.di.fc.ul.pt/~jpn/r/GraphicalTools/diagrammeR.html
+
+```{r}
+library(DiagrammeR)
+
+```
+
+
+```{r}
+grViz("
+  digraph boxes_and_circles {
+  
+    # a 'graph' statement
+    graph [overlap = true, fontsize = 10]
+  
+    # several 'node' statements
+    node [shape = box,
+          fontname = Helvetica]
+    A; B; C; D; E; F
+  
+    node [shape = circle,
+          fixedsize = true,
+          width = 0.9] // sets as circles
+    2; 3; 4; 5; 6; 7
+
+    node [shape = oval,
+          fixedsize = true,
+          peripheries = 2,
+          width = 0.9,
+          fontname = 'Courier New',
+          style=filled,
+          fillcolor = red]
+    8
+
+    node [label =<<table border='0' cellborder='1' cellpadding='3' bgcolor='white'>
+                    <tr><td bgcolor='black' align='center' colspan='2'><font color='white'>header</font> </td></tr>
+                    <tr><td align='left' port='r2'>&#40;2&#41; &#188; &bull;</td>
+                        <td bgcolor='grey' align='right'>$</td>
+                    </tr>
+                  </table>>
+          ] // sets as circles
+    1
+
+    # several 'edge' statements
+    A->1 B->2 B->3 B->4 C->A
+    1->D E->A 2->4 1->5 1->F
+    E->6 [label='x &#x2208; 3']
+    4->6 [label='&#946;&#x2082;=0.85']
+    5->7 [penwidth = 5]
+    6->7 [style=dotted,label='dotted']
+    3->8 [headport = 'e', tailport = 'e', color=blue]
+  }
+")
+```
+

@@ -1,0 +1,67 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+https://stackoverflow.com/questions/43289492/graphviz-how-to-have-a-subgraph-be-top-to-bottom-when-main-graph-is-left-to-ri
+
+```{r}
+library(DiagrammeR)
+
+grViz("
+digraph {
+  rankdir=LR;
+  node [shape=box]
+  x1;x2;x3;y1;y2;y3;y4;y5;y6;y7;y8;
+  node [shape=oval]
+  ind60;dem60;dem65;
+  {x1,x2,x3} -> ind60 
+  dem65->{y5,y6,y7,y8} 
+
+  subgraph cluster_0{
+    rankdir=TB 
+
+  {y1,y2,y3,y4} -> dem60[constraint=false]
+
+  }
+  ind60->dem60 ind60->dem65 dem60->dem65
+}
+")
+```
+
+
+```{r}
+library(DiagrammeR)
+
+grViz("
+
+digraph {
+  rankdir = LR;
+  node [shape=box]
+  
+  x1;x2;x3;y1;y2;y3;y4;y5;y6;y7;y8;
+  
+  node [shape=oval]
+  ind60; dem60; dem65;
+  {x1,x2,x3} -> ind60 
+  dem65 -> {y5, y6, y7, y8} 
+
+  subgraph cluster_0{
+
+      y2a[shape=point color=none]
+      y1 -> y2 -> y2a -> y3 -> y4[color=none weight=1000]
+      {y1 y2} -> dem60
+      {rank = same y2a ->dem60[color=none]}
+      {y3 y4} -> dem60
+
+  }
+  
+  {rank=same ya[shape=point color=none] x1 x2 x3}
+  {rank=same yb[shape=point color=none] y5 y6 y7 y8}
+  
+  ya -> y1[color=none] y4->yb[color=none]
+  ind60 -> dem60 ind60 -> dem65 dem60->dem65
+}
+")
+```
+

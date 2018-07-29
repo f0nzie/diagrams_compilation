@@ -1,0 +1,97 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+https://github.com/mikey-harper/blog/blob/master/content/post/2018-05-01-flowcharts-in-r-using-diagrammer/planningGrouping.gv
+
+
+# Subgraphs and clusters
+This post is not designed to be a comprehensive guide of DiagrammeR, but it is worth highlight that we can use subgraphs and clusters to demonstrates groups within the data. Figure @ref(fig:subgraphs) highlights an example of a graph I have produced within my analysis to show the classification of data across different categories within my model. The code used to make this graph is available through the GitHub repository here.
+
+```{r}
+DiagrammeR::grViz("planningGrouping.gv")
+```
+
+## inline code
+
+* Consider that DOT code inside "quotes" should be single quotes, or viceversa.
+
+
+```{r}
+library(DiagrammeR)
+
+data <- list(a = 1403, b = 489, c = 1700)
+
+DiagrammeR::grViz("
+digraph G {
+    rankdir=LR
+    graph[bgcolor = '#FDFDFD']
+    edge[style=invis]
+    node[fontname = 'helvetica', width = 1.5, height = 0.5, fontsize=12]
+    
+    
+    subgraph cluster_accepted {
+        node [shape=box,style=filled, fillcolor = red];
+        label = '@@1'
+        
+        style=dashed;
+    		color= '#625a5a';
+            fontname = 'helvetica-bold';
+            
+        node [shape=box, style=filled, color=black, fillcolor = '#91cf60'];
+        a0[label = 'Approved', shape = folder]
+        a1[label = 'Awaiting Construction']
+        a2[label = 'Decommissioned']
+        a3[label = 'Operational']
+        a4[label = 'Under \n Construction']
+        a5[label = 'No Application \n Required']
+            
+        a0 -> a2
+        a1 -> a5
+    }
+    
+    
+    subgraph cluster_submitted {
+        node [shape=box, style = filled, color=black, fillcolor = '#fee08b'];
+        label = '@@2';
+        style=dashed;
+        color= '#625a5a';
+        fontname = 'helvetica-bold';
+        
+        s0[label = 'In Planning']
+        s1[label = 'Connection \n Applied For']
+        s3[style=invis]
+        s4[style=invis]
+    }
+    
+    subgraph cluster_rejected {
+        node [shape=box, style = filled, color=black, fillcolor = '#fc8d59'];
+    		label = '@@3';
+            style=dashed;
+            fontname = 'helvetica-bold';
+            color = '#625a5a'
+                    
+    		b0[label = 'Refused']
+            b1[label = 'Withdrawn']
+            b2[label = 'No Application \n Made']
+            b3[label = 'Abandoned'];
+            }
+            
+        a2 -> s0 -> b0
+    }
+    
+    # node definitions with substituted label text
+    a [label = '@@1']
+    b [label = '@@2']
+    c [label = '@@3']
+    
+    
+    [1]: paste0('Accepted \\n  (n=', data$a, ')')
+    [2]: paste0('Submitted \\n (n=', data$b, ')')
+    [3]: paste0('Rejected  \\n (n=', data$c, ')')
+")
+```
+

@@ -1,0 +1,32 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+https://github.com/mikey-harper/blog/blob/master/content/post/2018-05-01-flowcharts-in-r-using-diagrammer/2018-05-01-flowcharts-in-r-using-diagrammer.Rmd
+
+A crucial option to specify is the label option, which lets us change the text within the shape. . We will piece together some of the examples below to highlight a more complex graph:
+
+```{r}
+library(DiagrammeR)
+
+
+DiagrammeR::grViz("digraph {
+
+    graph [layout = dot, rankdir = LR]
+    
+    # define the global styles of the nodes. We can override these in box if we wish
+    node [shape = rectangle, style = filled, fillcolor = Linen]
+    
+    data1 [label = 'Dataset 1', shape = folder, fillcolor = Beige]
+    data2 [label = 'Dataset 2', shape = folder, fillcolor = Beige]
+    
+    process     [label =  'Process \n Data']
+    statistical [label = 'Statistical \n Analysis']
+    results     [label= 'Results']
+    
+    # edge definitions with the node IDs
+    {data1 data2}  -> process -> statistical -> results
+}")
+```
+

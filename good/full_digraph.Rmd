@@ -1,0 +1,40 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+https://graphs.grevian.org/example
+
+```{r}
+
+library(DiagrammeR)
+
+DiagrammeR::grViz('
+    digraph {
+        a -> b[label="0.2",weight="0.2"];
+        a -> c[label="0.4",weight="0.4"];
+        c -> b[label="0.6",weight="0.6"];
+        c -> e[label="0.6",weight="0.6"];
+        e -> e[label="0.1",weight="0.1"];
+        e -> b[label="0.7",weight="0.7"];
+    }
+')
+```
+
+
+```{r}
+DiagrammeR::grViz('
+    graph {
+        a -- b[color=red,penwidth=3.0];
+        b -- c;
+        c -- d[color=red,penwidth=3.0];
+        d -- e;
+        e -- f;
+        a -- d;
+        b -- d[color=red,penwidth=3.0];
+        c -- f[color=red,penwidth=3.0];
+    }
+')    
+```
+
+

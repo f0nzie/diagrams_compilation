@@ -1,0 +1,63 @@
+---
+title: "Subgraphs"
+output: html_notebook
+---
+
+https://graphs.grevian.org/example#example-7
+
+# Subgraphs
+Please note there are some quirks here, First the name of the subgraphs are important, to be visually separated they must be prefixed with cluster_ as shown below, and second only the DOT and FDP layout methods seem to support subgraphs (See the graph generation page for more information on the layout methods)
+
+```{r}
+library(DiagrammeR)
+
+DiagrammeR::grViz('
+digraph {
+    subgraph cluster_0 {
+        label="Subgraph A";
+        a -> b;
+        b -> c;
+        c -> d;
+    }
+
+    subgraph cluster_1 {
+        label="Subgraph B";
+        a -> f;
+        f -> c;
+    }
+}
+
+')
+```
+
+
+
+
+```{r}
+library(DiagrammeR)
+
+DiagrammeR::grViz('
+
+graph {
+    splines=line;
+    subgraph cluster_0 {
+        label="Subgraph A";
+        a; b; c
+    }
+
+    subgraph cluster_1 {
+        label="Subgraph B";
+        d; e;
+    }
+
+    a -- e;
+    a -- d;
+    b -- d;
+    b -- e;
+    c -- d;
+    c -- e;
+}
+
+')
+```
+

@@ -1,0 +1,12 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+https://blog.rstudio.com/2015/05/01/rstudio-v0-99-preview-graphviz-and-diagrammer/
+
+```{r}
+library(DiagrammeR)
+mermaid("sequence.mmd")
+```
+
